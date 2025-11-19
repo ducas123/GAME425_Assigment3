@@ -10,6 +10,10 @@ public class CameraFollow : MonoBehaviour
 {
     public GameObject player;
     public Vector3 offset = new Vector3(-1.73f, 5.48f, -14.86f);
+    public float springConstant = 1f;
+    public float dampConstant = 1f;
+    private Vector3 velocity;
+    private Vector3 actualPosition;
 
     private void Start()
     {
@@ -18,6 +22,23 @@ public class CameraFollow : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        this.transform.position = player.transform.position + offset;
+        float hDist = player.transform.position.x - transform.position.x;
+        float vDist = player.transform.position.y - transform.position.y;
+        
+        Vector3 idealPosition =
+            player.transform.position - player.transform.forward * hDist + player.transform.up * vDist;
+        Vector3 displacement = actualPosition - idealPosition;
+
+        Vector3 springAccel = (-springConstant * displacement) - (dampConstant * velocity);
+        velocity += springAccel * Time.deltaTime;
+        actualPosition += velocity * Time.deltaTime;
+        
+        this.transform.position = actualPosition + offset;
+        
+    }
+
+    private void createLookAt()
+    {
+        
     }
 }
