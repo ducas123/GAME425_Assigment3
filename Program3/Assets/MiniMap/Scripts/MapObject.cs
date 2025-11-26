@@ -58,6 +58,33 @@ public class MapObject : MonoBehaviour
         //   sprRect.rotation
         //   linkedMiniMapEntity.rotateWithObject
         //   mapCamera.WorldToScreenPoint
+        
+        // finding world position cmopared to screen position
+        Vector3 viewportPos = mapCamera.WorldToViewportPoint(owner.transform.position);
 
+        // 2. Convert viewport to local coordinates inside the minimap
+        float x = (viewportPos.x - 0.5f) * rt.rect.width;
+        float y = (viewportPos.y - 0.5f) * rt.rect.height;
+
+        sprRect.anchoredPosition = new Vector2(x, y);
+
+        // 3. Rotation
+        float angle = linkedMiniMapEntity.rotation;
+        if (linkedMiniMapEntity.rotateWithObject)
+        {
+	        Vector3 eulerAngle = owner.transform.eulerAngles;
+	        float angleObject = 0f;
+
+	        if (linkedMiniMapEntity.upAxis.x != 0)
+		        angleObject = eulerAngle.x * Mathf.Sign(linkedMiniMapEntity.upAxis.x);
+	        else if (linkedMiniMapEntity.upAxis.y != 0)
+		        angleObject = eulerAngle.y * Mathf.Sign(linkedMiniMapEntity.upAxis.y);
+	        else if (linkedMiniMapEntity.upAxis.z != 0)
+		        angleObject = eulerAngle.z * Mathf.Sign(linkedMiniMapEntity.upAxis.z);
+
+	        angle += angleObject;
+        }
+
+        sprRect.rotation = Quaternion.Euler(0f, 0f, -angle);
 	}
 }
